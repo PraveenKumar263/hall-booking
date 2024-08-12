@@ -1,0 +1,22 @@
+{
+  "name": "hall-booking-app",
+  "version": "1.0.0",
+  "description": "Hall booking app enables the booking of room",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/PraveenKumar263/hall-booking.git"
+  },
+  "author": "Praveen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PraveenKumar263/hall-booking/issues"
+  },
+  "homepage": "https://github.com/PraveenKumar263/hall-booking#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
