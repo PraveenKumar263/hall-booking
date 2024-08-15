@@ -11,7 +11,8 @@ const bookingScehma = new mongoose.Schema({
     start_time: {type:Date, required: true},
     end_time: {type:Date, required: true},
     room_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Room'},
-    booking_status: {type: String, deafult:"Confirmed", required: true},
+    booking_status: {type: String, default:"Confirmed", required: true},
+    booking_date: { type: Date, default: Date.now }
 });
 
 // Step 3: export create model
