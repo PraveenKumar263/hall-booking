@@ -127,6 +127,98 @@ app.get('/api/v1/getAllBookedCustomerDetails', async (req, res) => {
   }
 });
 
+// Get all booked rooms detail
+app.get('/api/v1/getAllBookedRoomDetails', async (req, res) => {
+  try {
+    const bookedRooms = await Booking.aggregate([
+      {
+        $lookup: {
+          from: 'rooms',
+          localField: 'room_id',
+          foreignField: '_id',
+          as: 'room_details'
+        }
+      },
+      {
+        $unwind: '$room_details'
+      },
+      {
+        $project: {
+          _id: 0,
+          room_name: '$room_details.room_number',
+          booking_status: 1,
+          date: 1,
+          start_time: 1,
+          end_time: 1
+        }
+      }
+    ]);
+
+    // To format the date, start time & end time
+    const fmtBookedRooms = bookedRooms.map(booking => ({
+      ...booking,
+      date: booking.date ? format(booking.date, formatDateString) : null,
+      start_time: booking.start_time ? format(booking.start_time, formatTimeString) : null,
+      end_time: booking.end_time ? format(booking.end_time, formatTimeString) : null
+    }));
+
+    res.send(fmtBookedRooms);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+});
+
+// Get all customer bookings count
+app.get('/api/v1/getCustomerBookingCount/:customerName', async (req, res) => {
+  try {
+    const { customerName } = req.params;
+
+    const customerBookingDetails = await Booking.aggregate([
+      { $match: { customer_name: customerName } },
+      {
+        $lookup: {
+          from: 'rooms',
+          localField: 'room_id',
+          foreignField: '_id',
+          as: 'room_details'
+        }
+      },
+      { $unwind: '$room_details' },
+      {
+        $project: {
+          _id: 0,
+          customer_name: 1,
+          room_name: '$room_details.room_number',
+          date: 1,
+          start_time: 1,
+          end_time: 1,
+          room_id: 1,
+          booking_date: 1,
+          booking_status: 1
+        }
+      },
+      {
+        $group: {
+          _id: '$customer_name',
+          total_bookings: { $sum: 1 },
+          bookings: { $push: "$$ROOT" }
+        }
+      }
+    ]);
+
+    if (customerBookingDetails.length === 0) {
+      return res.status(404).send({ message: 'No bookings found for this customer' });
+    }
+
+    res.send({
+      customer_name: customerBookingDetails[0]._id,
+      total_bookings: customerBookingDetails[0].total_bookings,
+      bookings: customerBookingDetails[0].bookings
+    });
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+});
 
 // To find room and return only _id
 async function findRoomID(room_number) {
