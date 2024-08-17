@@ -1,5 +1,5 @@
 // import the db model
-const Room = require('../models/CreateRoom');
+const Room = require('../models/Room');
 const Booking = require('../models/Booking');
 
 // import date-format pkg
