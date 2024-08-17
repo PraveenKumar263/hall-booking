@@ -205,7 +205,6 @@ const hallController = {
                 date: 1,
                 start_time: 1,
                 end_time: 1,
-                room_id: 1,
                 booking_date: 1,
                 booking_status: 1
               }
@@ -222,11 +221,19 @@ const hallController = {
           if (customerBookingDetails.length === 0) {
             return res.status(404).send({ message: 'No bookings found for this customer' });
           }
-      
+          
+          // To format the date, start time & end time
+          const fmtBookedRooms = customerBookingDetails[0].bookings.map(booking => ({
+            ...booking,
+            date: booking.date ? format(booking.date, formatDateString) : null,
+            start_time: booking.start_time ? format(booking.start_time, formatTimeString) : null,
+            end_time: booking.end_time ? format(booking.end_time, formatTimeString) : null
+          }));
+
           res.send({
             customer_name: customerBookingDetails[0]._id,
             total_bookings: customerBookingDetails[0].total_bookings,
-            bookings: customerBookingDetails[0].bookings
+            bookings: fmtBookedRooms
           });
         } catch (error) {
           res.status(500).send({ message: error.message });
